@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load i18n account socialaccount crispy_forms_tags %}
+
+{% block head %}{{ form.media.css}}{% endblock head %}
+
+{% block content %}
+<div class='flex-grow-1 overflow-auto'>
+  <div class='container content pt-5'>
+    <header>{% trans "ROR and {{ site.name }}" %}</header>
+  </div>
+</div>
+{% endblock content %}
+

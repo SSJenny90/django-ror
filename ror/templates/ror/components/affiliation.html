@@ -1,0 +1,39 @@
+{% load i18n %}
+{% with org.info as meta %}
+<div class='card mb-3'>
+  <div class="card-header d-flex align-items-center">
+    <a href="{{ org.id }}" class='text-muted border-0'>{{ org.id }}</a>
+    <button hx-trigger='click' hx-method='delete' type="button" class="btn-close ms-auto" aria-label="Remove"></button>
+
+  </div>
+  <div class="card-body">
+    <div class='d-flex'>
+      <h5 class="card-title">
+        <a href="{{ meta.links.0 }}" class='border-0'>{{ meta.name }}</a>
+        {% for type in meta.types %}
+          <span class="badge bg-secondary">{{type}}</span>
+        {% endfor %}
+      </h5>
+    </div>
+
+    <h6 class="card-subtitle mb-2 text-muted">
+      {{ meta.addresses.0.geonames_city.city}}, {{ meta.country.country_name }}
+    </h6>
+
+    {% if created %}
+    <span class="badge bg-success" 
+      data-bs-toggle="popover"
+      data-bs-html='true'  
+      title="{% trans "New organization" %}" 
+      {% url "ror:about" as about_url %}{% blocktrans %}
+      data-bs-content="This is the first time we've seen this organization at {{site.name}}. You may be eligible to take ownership of this organization. You can find out more about organizations, ownership and administration <a href='{{ about_url }}'>here</a>."{% endblocktrans %}>
+      {% trans "New" %}</span>{% endif %}
+    <p class="card-text"><b>Domain:</b>{% for d in org.domains.all %}{{ d.name }}{% endfor %}</p>
+    <p class="card-text"><b>Users:</b>{{ org.organization_users.count }}</p>
+  </div>
+  {% with org.owner.organization_user.user as user %}{% endwith %}
+  <div class="card-footer">
+    Managed by: <a href="{{ user.get_absolute_url }}">{{ user }}</a> 
+  </div>
+</div>
+{% endwith %}

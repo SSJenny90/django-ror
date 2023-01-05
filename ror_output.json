@@ -1,0 +1,160 @@
+{
+    "tags": [
+        "dois"
+    ],
+    "summary": "Return a list of dois.",
+    "security": [],
+    "parameters": [
+        {
+            "in": "query",
+            "name": "query",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "created",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "registered",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "provider-id",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "client-id",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "person-id",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "resource-type-id",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "subject",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "schema-version",
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "in": "query",
+            "name": "random",
+            "schema": {
+                "type": "boolean"
+            }
+        },
+        {
+            "in": "query",
+            "name": "sample-size",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "sample-group",
+            "schema": {
+                "type": "string",
+                "enum": [
+                    "client",
+                    "provider",
+                    "resource-type"
+                ]
+            }
+        },
+        {
+            "in": "query",
+            "name": "page[number]",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "page[size]",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "page[cursor]",
+            "schema": {
+                "type": "number"
+            }
+        },
+        {
+            "in": "query",
+            "name": "include",
+            "schema": {
+                "type": "string",
+                "enum": [
+                    "client",
+                    "media"
+                ]
+            }
+        },
+        {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+                "type": "string",
+                "enum": [
+                    "relevance",
+                    "name",
+                    "-name",
+                    "created",
+                    "-created",
+                    "updated",
+                    "-updated"
+                ]
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "A JSON array of dois.",
+            "content": {
+                "application/vnd.api+json": {
+                    "schema": {
+                        "$ref": "#/components/schemas/Doi"
+                    }
+                }
+            }
+        }
+    },
+    "_path": "/dois",
+    "_method": "get"
+}

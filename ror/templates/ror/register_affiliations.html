@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n account socialaccount crispy_forms_tags %}
+
+{% block head %}{{ form.media.css}}{% endblock head %}
+
+{% block content %}
+<div class='flex-grow-1 overflow-auto'>
+  <div class='container content pt-5'>
+    <header>{% trans "Select your affiliations" %}</header>
+    {% blocktrans with site.name as site_name %}
+    <p>{{ site_name }} integrates directly with the Research Organization Registry (ROR). </p>
+    {% endblocktrans %}
+
+    {% crispy form %}	
+    <hr>
+    <div id='affiliationList'>
+      {% for org in organizations %}
+        {% include "ror/components/affiliation.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+{{ form.media.js}}
+
+<script>
+    $('select').on('select2:select', function (e) {
+      htmx.trigger('form', 'change')
+      $('select').val(null).trigger('change')
+    });
+
+</script>
+
+{% endblock scripts %}
