@@ -1,13 +1,14 @@
+from django.contrib.gis.geos import Point
+from django.core.validators import RegexValidator
+from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from organizations.abstract import (
     AbstractOrganization,
     AbstractOrganizationInvitation,
     AbstractOrganizationOwner,
-    AbstractOrganizationUser)
-from django.utils.text import slugify
-from django.core.validators import RegexValidator
-from django.db import models
-from django.contrib.gis.geos import Point
+    AbstractOrganizationUser,
+)
 from tldextract import extract
 
 
@@ -31,40 +32,30 @@ class Organization(AbstractOrganization):
     """Core research organization model that mimics the ROR
     database structure"""
 
-    id = models.URLField('id', primary_key=True,
-                         validators=[
-                             RegexValidator("^https://ror.org/0[a-z|0-9]{8}$")],
-                         help_text=_('Unique ROR ID for the organization. Stored as the url representation'))
-    info = models.JSONField(_('ROR data'),
-                            default=dict,
-                            help_text=_('organizational information obtained from ROR'))
-    parent = models.ForeignKey(
-        "self",
-        verbose_name=_('parent organization'),
-        help_text=_('The parent organization of the given organization'),
-        on_delete=models.SET_NULL,
-        related_name='children',
+    ror = models.URLField(
+        "id",
+        validators=[RegexValidator("^https://ror.org/0[a-z|0-9]{8}$")],
+        help_text=_(
+            "Unique ROR ID for the organization. Stored as the url representation"
+        ),
         null=True,
-        blank=True)
-    sibling = models.ManyToManyField(
-        "self",
-        verbose_name=_('sibling organization'),
-        help_text=_('Sibling organizations of the given organization'),
-        related_name='siblings',
-        blank=True)
-    relationships = models.JSONField(
-        verbose_name=_("relationships"),
-        help_text=_('Related organizations in ROR'),
-        blank=True, null=True)
+        blank=True,
+    )
+    extra = models.JSONField(
+        _("ROR data"),
+        default=dict,
+        help_text=_("organizational information obtained from ROR"),
+    )
     domains = models.ManyToManyField(
         RegisteredDomain,
-        verbose_name=_('domains'),
-        help_text=_('Registered domains sourced from the links field'),
-        blank=True)
+        verbose_name=_("domains"),
+        help_text=_("Registered domains sourced from the links field"),
+        blank=True,
+    )
 
     class Meta:
-        verbose_name = _('Research Organization')
-        verbose_name_plural = _('Research Organizations')
+        verbose_name = _("Organization")
+        verbose_name_plural = _("Organizations")
 
     def save(self, *args, **kwargs):
 
@@ -72,16 +63,17 @@ class Organization(AbstractOrganization):
         if not self.slug:
             self.slug = slugify(self.name)
 
-        self.name = self.info['name']
+        self.name = self.info["name"]
 
         obj = super().save(*args, **kwargs)
 
         # convert links to RegisteredDomain objects and save to instance.
         # This must be done after saving the object if it is newly created
         domains = []
-        for url in self.info['links']:
+        for url in self.info["links"]:
             dom = RegisteredDomain.objects.get_or_create(
-                name=extract(url).registered_domain)[0]
+                name=extract(url).registered_domain
+            )[0]
             domains.append(dom)
 
         self.domains.add(*domains)
@@ -91,24 +83,27 @@ class Organization(AbstractOrganization):
     def get(self, lookup):
         """Convenience function for accessing ROR data"""
         data = self.info
-        for x in lookup.split('__'):
+        for x in lookup.split("__"):
             data = data.get(x)
         return data
 
     def established(self):
-        return self.get('established')
-    established.admin_order_field = 'info__established'
-    established.short_description = _('established')
+        return self.get("established")
+
+    established.admin_order_field = "info__established"
+    established.short_description = _("established")
 
     def country(self):
-        return self.get('country__country_name')
-    country.admin_order_field = 'info__country__country_name'
-    country.short_description = _('country')
+        return self.get("country__country_name")
+
+    country.admin_order_field = "info__country__country_name"
+    country.short_description = _("country")
 
     def city(self):
-        return self.get('addresses')[0].get('city', '')
-    city.admin_order_field = 'info__addresses__city'
-    city.short_description = _('city')
+        return self.get("addresses")[0].get("city", "")
+
+    city.admin_order_field = "info__addresses__city"
+    city.short_description = _("city")
 
     @property
     def location(self):
@@ -118,12 +113,12 @@ class Organization(AbstractOrganization):
     @property
     def lat(self):
         if self.addresses:
-            return self.addresses[0].get('lat', '')
+            return self.addresses[0].get("lat", "")
 
     @property
     def lng(self):
         if self.addresses:
-            return self.addresses[0].get('lng', '')
+            return self.addresses[0].get("lng", "")
 
 
 class OrganizationUser(AbstractOrganizationUser):
@@ -142,4 +137,5 @@ class OrganizationOwner(AbstractOrganizationOwner):
 
 class OrganizationInvitation(AbstractOrganizationInvitation):
     """Stores invitations for adding users to organizations"""
+
     pass
